@@ -110,6 +110,14 @@ class Pawn < Piece
       end
     end
 
+    if @color == :white && x == 1
+      double_move = [x + 2, y]
+      moves << double_move
+    elsif @color == :black && x == Board::SIZE - 2
+      double_move = [x - 2, y]
+      moves << double_move
+    end
+
 
     moves
   end

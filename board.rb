@@ -25,7 +25,7 @@ class Board
       @grid[row][1] = Knight.new(self, [row, 1], color)
       @grid[row][2] = Bishop.new(self, [row, 2], color)
       @grid[row][3] = Queen.new(self, [row, 3], color)
-      @grid[row][4] = King.new(self, [row, 3], color)
+      @grid[row][4] = King.new(self, [row, 4], color)
       @grid[row][5] = Bishop.new(self, [row, 5], color)
       @grid[row][6] = Knight.new(self, [row, 6], color)
       @grid[row][7] = Rook.new(self, [row, 7], color)
