@@ -1,3 +1,6 @@
+#encoding: utf-8
+require_relative 'board'
+
 class Piece
 
   attr_reader :color
@@ -24,10 +27,10 @@ class SlidingPiece < Piece
     moves = []
 
     @dirs.each do |dx, dy|
-      (1...8). do |magnitude|
+      (1...Board::SIZE).each do |magnitude|
         move = [x + dx * magnitude, y + dy * magnitude]
 
-        break unless Board.valid_pos(move)
+        break unless Board.valid_pos?(move)
 
         if @board[move]
           moves << move unless @board[move].color == @color
@@ -45,7 +48,8 @@ end#####################################################################
 
 class SteppingPiece < Piece
 
-  def initiailize(board, pos, color, steps)
+  def initialize(board, pos, color, steps)
+    puts "here"
     super(board, pos, color)
     @steps = steps
   end
@@ -96,6 +100,15 @@ class Pawn < Piece
 
     moves
   end
+
+  def to_s
+    case @color
+    when :white
+      "♙"
+    when :black
+      "♟"
+    end
+  end
 end#####################################################################
 
 class Rook < SlidingPiece
@@ -111,6 +124,15 @@ class Rook < SlidingPiece
     super(board, pos, color, DIRS)
   end
 
+  def to_s
+    case @color
+    when :white
+      "♖"
+    when :black
+      "♜"
+    end
+  end
+
 end
 
 class Bishop < SlidingPiece
@@ -124,6 +146,15 @@ class Bishop < SlidingPiece
 
   def initialize(board, pos, color)
     super(board, pos, color, DIRS)
+  end
+
+  def to_s
+    case @color
+    when :white
+      "♗"
+    when :black
+      "♝"
+    end
   end
 
 end
@@ -145,4 +176,68 @@ class Queen < SlidingPiece
     super(board, pos, color, DIRS)
   end
 
+  def to_s
+    case @color
+    when :white
+      "♕"
+    when :black
+      "♛"
+    end
+  end
+
+end
+
+class Knight < SteppingPiece
+
+  STEPS = [
+    [1, 2],
+    [1, -2],
+    [-1, 2],
+    [-1, -2],
+    [2, 1],
+    [2, -1],
+    [-2, 1],
+    [-2, -1]
+  ]
+
+  def initialize(board, pos, color)
+    super(board, pos, color, STEPS)
+  end
+
+  def to_s
+    case @color
+    when :white
+      "♘"
+    when :black
+      "♞"
+    end
+  end
+
+end
+
+class King < SteppingPiece
+
+  STEPS = [
+    [1, 1],
+    [1, 0],
+    [1, -1],
+    [0, -1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, 1]
+  ]
+
+  def initialize(board, pos, color)
+    super(board, pos, color, STEPS)
+  end
+
+  def to_s
+    case @color
+    when :white
+      "♔"
+    when :black
+      "♚"
+    end
+  end
 end
