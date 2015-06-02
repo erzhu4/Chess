@@ -72,6 +72,24 @@ class Board
     nil
   end
 
+  def dup
+    new_board = Board.new
+
+    @grid.each_with_index do |row, row_idx|
+      row.each_with_index do |square, col_idx|
+        next unless square
+        color = square.color
+        piece_type = square.class
+        piece = piece_type.new(new_board, [row_idx, col_idx], color)
+        new_board[[row_idx, col_idx]] = piece
+      end
+    end
+
+    new_board
+  end
+
+  
+
 end############################################
 
 
