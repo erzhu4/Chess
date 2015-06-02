@@ -21,7 +21,6 @@ class Board
     end
 
     [[0, :white], [SIZE - 1, :black]].each do |row, color|
-      #debugger
       @grid[row][0] = Rook.new(self, [row, 0], color)
       @grid[row][1] = Knight.new(self, [row, 1], color)
       @grid[row][2] = Bishop.new(self, [row, 2], color)
