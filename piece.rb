@@ -8,11 +8,6 @@ class Piece
 
   def move
   end
-
-  private
-  def self.valid_pos?(pos)
-    pos.all? { |idx| idx.between?(0, 7) }
-  end
 end
 
 class SlidingPiece < Piece
@@ -29,7 +24,7 @@ class SlidingPiece < Piece
     @dirs.each do |dx, dy|
       (1...8). do |magnitude|
         move = [x + dx * magnitude, y + dy * magnitude]
-        
+
         break unless Board.valid_pos(move)
 
         if @board[move]
@@ -40,9 +35,33 @@ class SlidingPiece < Piece
         moves << move
       end
     end
+
+    moves
   end
 
 end#####################################################################
 
 class SteppingPiece < Piece
-end
+
+  def initiailize(board, pos, color, steps)
+    super(board, pos, color)
+    @steps = steps
+  end
+
+  def valid_moves
+    x, y = @pos
+    moves = []
+
+    @steps.each do |dx, dy|
+      move = [x + dx, y + dy]
+
+      next unless Board.valid_pos?(move)
+      next if @board[move] && @board[move].color == @color
+
+      moves << move
+    end
+
+    moves
+  end
+
+end#######################################
