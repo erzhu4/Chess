@@ -12,6 +12,13 @@ class Piece
     @color = color
   end
 
+  def move_into_check?(pos)
+    duped_board = @board.dup
+
+    duped_board.move(@pos, pos)
+    duped_board.in_check?(@color)
+  end
+
 end
 
 class SlidingPiece < Piece
