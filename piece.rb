@@ -1,5 +1,6 @@
 #encoding: utf-8
 require_relative 'board'
+require 'byebug'
 
 class Piece
 
@@ -13,10 +14,17 @@ class Piece
   end
 
   def move_into_check?(pos)
+  #  debugger
     duped_board = @board.dup
-
-    duped_board.move(@pos, pos)
+    duped_board[pos] = self.class.new(duped_board, pos, @color)
+    duped_board[@pos] = nil
     duped_board.in_check?(@color)
+  end
+
+  def valid_moves
+    moves.delete_if do |move|
+      self.move_into_check?(move)
+    end
   end
 
 end
@@ -28,7 +36,7 @@ class SlidingPiece < Piece
     @dirs = dirs
   end
 
-  def valid_moves
+  def moves
     x, y = @pos
     moves = []
 
@@ -59,7 +67,7 @@ class SteppingPiece < Piece
     @steps = steps
   end
 
-  def valid_moves
+  def moves
     x, y = @pos
     moves = []
 
@@ -85,7 +93,7 @@ class Pawn < Piece
     @sides = [[0, 1], [0, -1]]
   end
 
-  def valid_moves
+  def moves
     x, y = @pos
 
     dx, dy = @dir

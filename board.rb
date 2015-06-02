@@ -62,8 +62,12 @@ class Board
   def move(start_pos, final_pos)
     raise NoPieceError unless self[start_pos]
 
-    unless self[start_pos].valid_moves.include?(final_pos)
+    unless self[start_pos].moves.include?(final_pos)
       raise InvalidMoveError
+    end
+
+    if self[start_pos].move_into_check?(final_pos)
+      raise MoveIntoCheckError
     end
 
     self[start_pos], self[final_pos] = nil, self[start_pos]
@@ -95,7 +99,13 @@ class Board
     other_color = (color == :white) ? :black : :white
 
     pieces(other_color).any? do |piece|
-      piece.valid_moves.include?(king.pos)
+      piece.moves.include?(king.pos)
+    end
+  end
+
+  def checkmate?(color)
+    in_check?(color) && pieces(color).all? do |piece|
+      piece.valid_moves.empty?
     end
   end
 
@@ -111,4 +121,7 @@ class NoPieceError < StandardError
 end
 
 class InvalidMoveError < StandardError
+end
+
+class MoveIntoCheckError < StandardError
 end
