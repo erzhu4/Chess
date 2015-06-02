@@ -32,11 +32,17 @@ class Board
       @grid[row][7] = Rook.new(self, [row, 7], color)
     end
 
+    nil
   end
 
   def [](pos)
     row, col = pos
     @grid[row][col]
+  end
+
+  def []=(pos, value)
+    row, col = pos
+    @grid[row][col] = value
   end
 
   def display
@@ -50,4 +56,23 @@ class Board
     nil
   end
 
+  def move(start_pos, final_pos)
+    raise NoPieceError unless self[start_pos]
+
+    unless self[start_pos].valid_moves.include?(final_pos)
+      raise InvalidMoveError
+    end
+
+    self[start_pos], self[final_pos] = nil, self[start_pos]
+
+    nil
+  end
+
+end############################################
+
+
+class NoPieceError < StandardError
+end
+
+class InvalidMoveError < StandardError
 end

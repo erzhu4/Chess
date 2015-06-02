@@ -11,8 +11,6 @@ class Piece
     @color = color
   end
 
-  def move
-  end
 end
 
 class SlidingPiece < Piece
@@ -49,7 +47,6 @@ end#####################################################################
 class SteppingPiece < Piece
 
   def initialize(board, pos, color, steps)
-    puts "here"
     super(board, pos, color)
     @steps = steps
   end
