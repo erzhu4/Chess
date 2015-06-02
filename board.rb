@@ -88,7 +88,22 @@ class Board
     new_board
   end
 
-  
+  def in_check?(color)
+    king = pieces(color).select do |piece|
+      piece.is_a?(King)
+    end.first
+
+    other_color = (color == :white) ? :black : :white
+
+    pieces(other_color).any? do |piece|
+      piece.valid_moves.include?(king.pos)
+    end
+  end
+
+  private
+  def pieces(color)
+    @grid.flatten.select { |square| square && square.color == color }
+  end
 
 end############################################
 
