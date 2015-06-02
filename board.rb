@@ -13,22 +13,22 @@ class Board
 
   def set_up
     @grid[1].each_index do |col|
-      @grid[1][col] = Pawn.new(self, [1, col], :white)
+      self[[1, col]] = Pawn.new(self, :white)
     end
 
     @grid[SIZE - 2].each_index do |col|
-      @grid[SIZE - 2][col] = Pawn.new(self, [SIZE - 2, col], :black)
+      self[[SIZE - 2, col]] = Pawn.new(self, :black)
     end
 
     [[0, :white], [SIZE - 1, :black]].each do |row, color|
-      @grid[row][0] = Rook.new(self, [row, 0], color)
-      @grid[row][1] = Knight.new(self, [row, 1], color)
-      @grid[row][2] = Bishop.new(self, [row, 2], color)
-      @grid[row][3] = Queen.new(self, [row, 3], color)
-      @grid[row][4] = King.new(self, [row, 4], color)
-      @grid[row][5] = Bishop.new(self, [row, 5], color)
-      @grid[row][6] = Knight.new(self, [row, 6], color)
-      @grid[row][7] = Rook.new(self, [row, 7], color)
+      self[[row, 0]] = Rook.new(self, color)
+      self[[row, 1]] = Knight.new(self, color)
+      self[[row, 2]] = Bishop.new(self, color)
+      self[[row, 3]] = Queen.new(self, color)
+      self[[row, 4]] = King.new(self, color)
+      self[[row, 5]] = Bishop.new(self, color)
+      self[[row, 6]] = Knight.new(self, color)
+      self[[row, 7]] = Rook.new(self, color)
     end
 
     nil
@@ -75,16 +75,20 @@ class Board
     nil
   end
 
+  def occupied_by?(color, pos)
+    return false unless self[pos]
+
+    self[pos].color == color
+  end
+
   def dup
     new_board = Board.new
 
     @grid.each_with_index do |row, row_idx|
       row.each_with_index do |square, col_idx|
         next unless square
-        color = square.color
-        piece_type = square.class
-        piece = piece_type.new(new_board, [row_idx, col_idx], color)
-        new_board[[row_idx, col_idx]] = piece
+
+        new_board[[row_idx, col_idx]] = square.dup(new_board)
       end
     end
 
@@ -92,9 +96,9 @@ class Board
   end
 
   def in_check?(color)
-    king = pieces(color).select do |piece|
+    king = pieces(color).find do |piece|
       piece.is_a?(King)
-    end.first
+    end
 
     other_color = (color == :white) ? :black : :white
 
@@ -105,13 +109,14 @@ class Board
 
   def checkmate?(color)
     in_check?(color) && pieces(color).all? do |piece|
+      debugger
       piece.valid_moves.empty?
     end
   end
 
   private
   def pieces(color)
-    @grid.flatten.select { |square| square && square.color == color }
+    @grid.flatten.compact.select { |square| square.color == color }
   end
 
 end############################################

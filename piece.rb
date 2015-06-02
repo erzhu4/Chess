@@ -7,16 +7,15 @@ class Piece
   attr_reader :color
   attr_accessor :pos
 
-  def initialize(board, pos, color)
+  def initialize(board, color)
     @board = board
-    @pos = pos
     @color = color
+    @pos = nil
   end
 
   def move_into_check?(pos)
-  #  debugger
     duped_board = @board.dup
-    duped_board[pos] = self.class.new(duped_board, pos, @color)
+    duped_board[pos] = self.class.new(duped_board, @color)
     duped_board[@pos] = nil
     duped_board.in_check?(@color)
   end
@@ -27,27 +26,29 @@ class Piece
     end
   end
 
+  def dup(duped_board)
+    self.class.new(duped_board, @color)
+  end
 end
 
 class SlidingPiece < Piece
 
-  def initialize(board, pos, color, dirs)
-    super(board, pos, color)
-    @dirs = dirs
+  def initialize(board, color)
+    super(board, color)
   end
 
   def moves
     x, y = @pos
     moves = []
 
-    @dirs.each do |dx, dy|
+    self.class::DIRS.each do |dx, dy|
       (1...Board::SIZE).each do |magnitude|
         move = [x + dx * magnitude, y + dy * magnitude]
 
         break unless Board.valid_pos?(move)
 
         if @board[move]
-          moves << move unless @board[move].color == @color
+          moves << move unless @board.occupied_by?(@color, move)
           break
         end
 
@@ -62,20 +63,19 @@ end#####################################################################
 
 class SteppingPiece < Piece
 
-  def initialize(board, pos, color, steps)
-    super(board, pos, color)
-    @steps = steps
+  def initialize(board, color)
+    super(board, color)
   end
 
   def moves
     x, y = @pos
     moves = []
 
-    @steps.each do |dx, dy|
+    self.class::STEPS.each do |dx, dy|
       move = [x + dx, y + dy]
 
       next unless Board.valid_pos?(move)
-      next if @board[move] && @board[move].color == @color
+      next if @board.occupied_by?(@color, move)
 
       moves << move
     end
@@ -87,8 +87,8 @@ end#######################################
 
 class Pawn < Piece
 
-  def initialize(board, pos, color)
-    super(board, pos, color)
+  def initialize(board, color)
+    super(board, color)
     @dir = (@color == :white) ? [1, 0] : [-1, 0]
     @sides = [[0, 1], [0, -1]]
   end
@@ -97,29 +97,32 @@ class Pawn < Piece
     x, y = @pos
 
     dx, dy = @dir
-    move = [x + dx, y + dy]
+    move = [x + dx, y]
     return [] unless Board.valid_pos?(move)
 
     moves = []
     moves << move unless @board[move]
 
     @sides.each do |sx, sy|
-      side_move = [x + dx + sx, y + dy + sy]
-      if @board[side_move] && @board[side_move].color != @color
-        moves << side_move
+      other_color = (@color == :white) ? :black : :white
+      move = [x + dx + sx, y + dy + sy]
+      if @board.occupied_by?(other_color, move)
+        moves << move
       end
     end
 
-    if @color == :white && x == 1
-      double_move = [x + 2, y]
-      moves << double_move
-    elsif @color == :black && x == Board::SIZE - 2
-      double_move = [x - 2, y]
+    if first_move?
+      double_move = [x + (dx * 2), y]
       moves << double_move
     end
 
-
     moves
+  end
+
+  def first_move?
+    x, y = @pos
+    (@color == :white && x == 1) ||
+      (@color == :black && x == Board::SIZE - 2)
   end
 
   def to_s
@@ -141,8 +144,8 @@ class Rook < SlidingPiece
     [0, -1],
   ]
 
-  def initialize(board, pos, color)
-    super(board, pos, color, DIRS)
+  def initialize(board, color)
+    super(board, color)
   end
 
   def to_s
@@ -165,8 +168,8 @@ class Bishop < SlidingPiece
     [-1, -1]
   ]
 
-  def initialize(board, pos, color)
-    super(board, pos, color, DIRS)
+  def initialize(board, color)
+    super(board, color)
   end
 
   def to_s
@@ -193,8 +196,8 @@ class Queen < SlidingPiece
     [0, -1]
   ]
 
-  def initialize(board, pos, color)
-    super(board, pos, color, DIRS)
+  def initialize(board, color)
+    super(board, color)
   end
 
   def to_s
@@ -221,8 +224,8 @@ class Knight < SteppingPiece
     [-2, -1]
   ]
 
-  def initialize(board, pos, color)
-    super(board, pos, color, STEPS)
+  def initialize(board, color)
+    super(board, color)
   end
 
   def to_s
@@ -249,8 +252,8 @@ class King < SteppingPiece
     [0, 1]
   ]
 
-  def initialize(board, pos, color)
-    super(board, pos, color, STEPS)
+  def initialize(board, color)
+    super(board, color)
   end
 
   def to_s
