@@ -40,9 +40,13 @@ class Board
     @grid[row][col]
   end
 
-  def []=(pos, value)
+  def []=(pos, piece)
     row, col = pos
-    @grid[row][col] = value
+    @grid[row][col] = piece
+
+    piece.pos = pos unless piece.nil?
+
+    piece
   end
 
   def display
