@@ -24,8 +24,8 @@ class Board
       self[[row, 0]] = Rook.new(self, color)
       self[[row, 1]] = Knight.new(self, color)
       self[[row, 2]] = Bishop.new(self, color)
-      self[[row, 3]] = King.new(self, color)
-      self[[row, 4]] = Queen.new(self, color)
+      self[[row, 3]] = Queen.new(self, color)
+      self[[row, 4]] = King.new(self, color)
       self[[row, 5]] = Bishop.new(self, color)
       self[[row, 6]] = Knight.new(self, color)
       self[[row, 7]] = Rook.new(self, color)
@@ -49,7 +49,7 @@ class Board
   end
 
   def display
-    @grid.each do |row|
+    @grid.reverse.each do |row|
       row.each do |square|
         print square ? square.to_s : "▢"
       end
@@ -60,14 +60,14 @@ class Board
   end
 
   def move(start_pos, final_pos)
-    raise NoPieceError unless self[start_pos]
+    raise NoPieceError.new(start_pos) unless self[start_pos]
 
     unless self[start_pos].moves.include?(final_pos)
-      raise InvalidMoveError
+      raise InvalidMoveError.new(self[start_pos], final_pos)
     end
 
     if self[start_pos].move_into_check?(final_pos)
-      raise MoveIntoCheckError
+      raise MoveIntoCheckError.new
     end
 
     self[start_pos], self[final_pos] = nil, self[start_pos]
@@ -127,10 +127,32 @@ end############################################
 
 
 class NoPieceError < StandardError
+  def initialize(pos)
+    @pos = pos
+  end
+
+  def message
+    pos_str = "#{HumanPlayer::COLS.keys[@pos[1]]}#{@pos[0] + 1}"
+
+    "There is no piece in #{pos_str}"
+  end
 end
 
 class InvalidMoveError < StandardError
+  def initialize(piece, move)
+    @move = move
+    @piece = piece
+  end
+
+  def message
+    pos_str = "#{HumanPlayer::COLS.keys[@move[1]]}#{@move[0] + 1}"
+    "You cannot move your #{@piece.class.to_s.downcase} to #{pos_str}."
+  end
+
 end
 
 class MoveIntoCheckError < StandardError
+  def message
+    "That move puts your king in check!"
+  end
 end

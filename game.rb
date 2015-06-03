@@ -1,9 +1,10 @@
 require_relative 'piece'
 require_relative 'board'
+require_relative 'player'
 
 class ChessGame
 
-  def intiailize(white_player, black_player)
+  def initialize(white_player, black_player)
     @white_player = white_player
     @black_player = black_player
     @current_player = white_player
@@ -12,11 +13,18 @@ class ChessGame
 
   def play
     @board.set_up
+    @board.display
 
     until @board.over?
       turn
+      @board.display
     end
-    #win condition goes here
+
+    if @board.checkmate?(:white)
+      puts "Black wins!"
+    elsif @board.checkmate?(:black)
+      puts "White wins!"
+    end
   end
 
   def turn
@@ -27,12 +35,16 @@ class ChessGame
       puts e.message
       retry
     end
+
     toggle_player
   end
 
   def toggle_player
-    @current_player = (@current_player == @white_player) ?
-                      @black_player : @white_player
+    if @current_player == @white_player
+      @current_player = @black_player
+    else
+      @current_player = @white_player
+    end
   end
 
 end
