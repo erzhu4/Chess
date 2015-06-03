@@ -125,8 +125,10 @@ class Board
 
 end############################################
 
+class ChessError < StandardError
+end
 
-class NoPieceError < StandardError
+class NoPieceError < ChessError
   def initialize(pos)
     @pos = pos
   end
@@ -138,7 +140,7 @@ class NoPieceError < StandardError
   end
 end
 
-class InvalidMoveError < StandardError
+class InvalidMoveError < ChessError
   def initialize(piece, move)
     @move = move
     @piece = piece
@@ -151,7 +153,7 @@ class InvalidMoveError < StandardError
 
 end
 
-class MoveIntoCheckError < StandardError
+class MoveIntoCheckError < ChessError
   def message
     "That move puts your king in check!"
   end

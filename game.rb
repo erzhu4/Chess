@@ -29,9 +29,14 @@ class ChessGame
 
   def turn
     begin
-      move = @current_player.get_move
-      @board.move(*move)
-    rescue StandardError => e
+      start_pos, final_pos = @current_player.get_move
+
+      unless @board[start_pos].color == @current_player.color
+        raise WrongColorError
+      end
+
+      @board.move(start_pos, final_pos)
+    rescue ChessError => e
       puts e.message
       retry
     end
@@ -47,4 +52,16 @@ class ChessGame
     end
   end
 
+end
+
+class WrongColorError < ChessError
+  def message
+    "You cannot move that piece!"
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  p1 = HumanPlayer.new(:white)
+  p2 = HumanPlayer.new(:black)
+  ChessGame.new(p1, p2).play
 end
