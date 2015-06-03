@@ -114,6 +114,10 @@ class Board
     end
   end
 
+  def over?
+    checkmate?(:white) || checkmate?(:black)
+  end
+
   private
   def pieces(color)
     @grid.flatten.compact.select { |square| square.color == color }
