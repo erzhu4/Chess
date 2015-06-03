@@ -109,7 +109,7 @@ class Board
 
   def checkmate?(color)
     in_check?(color) && pieces(color).all? do |piece|
-      debugger
+      #debugger
       piece.valid_moves.empty?
     end
   end

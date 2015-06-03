@@ -113,7 +113,9 @@ class Pawn < Piece
 
     if first_move?
       double_move = [x + (dx * 2), y]
-      moves << double_move
+      unless @board[double_move]
+        moves << double_move
+      end
     end
 
     moves
